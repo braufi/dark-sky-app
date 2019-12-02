@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dark Sky Weather APP</title>
+        <link rel="stylesheet" type="text/css" href="public/weathericons/css/weather-icons.min.css" />
+        <script src="public/js/angular.min.js"></script>
+        <script src="public/js/skycons.js"></script>
+    </head>
+    <body ng-app="appWeather" ng-controller="weatherController">
+        <form name="weatherForm" novalidate>
+            <p>Latitude</p>
+            <input type="text" name="latitude" ng-model="latitude" required>
+            <p>Longitude</p>
+            <input type="text" name="longitude" ng-model="longitude" required>
+            <br/>
+            <br/>
+            <button ng-disabled="weatherForm.latitude.$pristine || weatherForm.longitude.$pristine" ng-click="checkWeather()">Check Weather</button>
+        </form>
+
+        <h3>Current Weather</h3>
+        <i class="wi {{wIcon}}" style="font-size: 4em;"></i>
+        <p>Weather: <span ng-bind="weather"></span></p>
+        <p>Temp: <span ng-bind="tempF|number:2"></span> ºF | <span ng-bind="(tempC-32)*5/9 | number:2"></span> ºC</p>
+
+        <h3>Hourly Weather</h3>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Icon</th>
+                <th>Weather</th>
+                <th>Temp ºF</th>
+                <th>Temp ºC</th>
+            </tr>
+            <tr ng-repeat="weather in weathers | orderBy:'-time'">
+                <td ng-bind="weather.time | date:HH:mm:ss Z"></td>
+                <td><i class="wi {{weather.icon | weathericon}}" style="font-size: 70px; margin:20px;"></i></td>
+                <td ng-bind="weather.summary"></td>
+			    <td ng-bind="weather.temperature | number:2" style="text-align:center;"></td>
+			    <td ng-bind="(weather.temperature-32)*5/9 | number:1" style="text-align:center;"></td>
+            </tr>
+        </table>
+        <script>
+            //Wether module (app)
+            var appWeather = angular.module('appWeather',[]);
+
+            appWeather.filter('weathericon', function(){
+
+            });
+
+            //weather controler
+            appWeather.controller('weatherController', function($scope, $http){
+
+            });
+        </script>
+    </body>
+</html>

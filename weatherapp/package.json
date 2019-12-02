@@ -9,6 +9,13 @@
   "author": "Bujar Raufi",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "angularjs": "0.0.1",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "moment": "^2.24.0",
+    "nedb": "^1.8.0",
+    "node-fetch": "^2.6.0",
+    "unirest": "^0.6.0"
   }
 }

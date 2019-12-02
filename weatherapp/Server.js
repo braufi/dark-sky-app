@@ -1,12 +1,24 @@
-var express = require('express');
+const express = require('express');
+var Request = require("request");
+var path = require('path');
 
-const app = express();
+//Routes
+var indexRouter = require('./routes/index');
+
+require('dotenv').config();
+
 const credentials = require('./apiCredentials.json');
 
-app.use(express.static('/public'));
-
-app.get('/weather', (req, res) => {
-
+const app = express();
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Starting server at ${port}`);
 });
 
-app.listen(3000, () => { console.info('Listening on port :3000'); });
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: false }));
+
+app.use('/', indexRouter);
+
+module.exports = app;
