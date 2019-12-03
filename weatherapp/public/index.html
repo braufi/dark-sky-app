@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Dark Sky Weather APP</title>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			  crossorigin="anonymous"></script>
+        <link rel="stylesheet" type="text/css" href="weathericons/css/weather-icons.min.css" />
+        <script src="js/angular.min.js"></script>
+        <script src="js/skycons.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </head>
+    <body ng-app="appWeather" ng-controller="weatherController">
+        <div class="container fluid">
+            <div class="row">
+                <div class="col-sm-3">
+                <form name="weatherForm" novalidate>
+                        <p>Latitude</p>
+                        <input class="form-control" type="text" name="latitude" ng-model="latitude" required>
+                        <p>Longitude</p>
+                        <input class="form-control" type="text" name="longitude" ng-model="longitude" required>
+                        <br/>
+                        <button class="btn btn-info" ng-disabled="weatherForm.latitude.$pristine || weatherForm.longitude.$pristine" ng-click="checkWeather()">Check Weather</button>
+                </form><br/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 card">
+                <h3 class="card-header">Current Weather</h3>
+                <i class="wi {{weatherIcon}}" style="font-size: 4em;"></i><br/>
+                <p>Weather: <span ng-bind="weather"></span></p>
+                <p>Temp: <span ng-bind="tempF|number:2"></span> ºF | <span ng-bind="(tempC-32)*5/9 | number:2"></span> ºC</p>
+            </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                <h3>Hourly Weather</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <th>Time</th>
+                        <th>Icon</th>
+                        <th>Weather</th>
+                        <th>Temp ºF</th>
+                        <th>Temp ºC</th>
+                    </tr>
+                    <tr ng-repeat="weather in weathers | orderBy:'-time'">
+                        <td ng-bind="weather.time | date:'HH:mm:ss'"></td>
+                        <td><i class="wi {{weather.icon | iconweather}}" style="font-size: 70px; margin:20px;"></i></td>
+                        <td ng-bind="weather.summary"></td>
+                        <td ng-bind="weather.temperature | number:2" style="text-align:center;"></td>
+                        <td ng-bind="(weather.temperature-32)*5/9 | number:1" style="text-align:center;"></td>
+                    </tr>
+                </table>
+                </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            //Wether module (app)
+            var appWeather = angular.module('appWeather',[]);
+
+            appWeather.filter('iconweather', function(){
+                return function(text){
+                    var icon="";
+                    switch(text){
+                        case "clear-day": icon = 'wi-day-sunny';
+					        break;
+                        case "clear-night": icon = 'wi-night-clear';
+                            break;
+                        case "partly-cloudy-day": icon = 'wi-day-cloudy';
+                            break;
+                        case "partly-cloudy-night": icon = 'wi-night-partly-cloudy';
+                            break;
+                        case "cloudy": icon = 'wi-cloudy';
+                            break;
+                        case "rain": icon = 'wi-rain';
+                            break;
+                        case "sleet": icon = 'sleet';
+                            break;
+                        case "snow": icon = 'wi-snow';
+                            break;
+                        case "wind": icon = 'wi-strong-wind';
+                            break;
+                        case "fog": icon = 'wi-fog';
+                            break;
+                        default:
+                    }
+                    return icon;
+                }
+            });
+
+            //weather controler
+            appWeather.controller('weatherController', function($scope, $http){
+                $scope.checkWeather = function(){
+                    var longitude = $scope.longitude;
+                    var latitude = $scope.latitude;
+                    $scope.tempC = 0;
+                    //Reading the Dark Sky API
+                    $http({
+                        method: 'GET',
+                        url: "https://api.darksky.net/forecast/5b5a4a4a8501d9cb752b3a997cf2027c/" + latitude + "," + longitude
+                    })
+                    .then(function(response){
+                        $scope.weather = "";
+                        $scope.weather = response.data.currently.summary;
+                        $scope.tempF = response.data.currently.temperature;
+                        $scope.tempC = response.data.currently.temperature;
+
+                        //Hourly data 
+                        $scope.weathers = response.data.hourly.data;
+
+                        switch(response.data.currently.icon){
+                            case "clear-day": $scope.weatherIcon = 'wi-day-sunny';
+					            break;
+					        case "clear-night": $scope.weatherIcon = 'wi-night-clear';
+					            break;
+					        case "partly-cloudy-day": $scope.weatherIcon = 'wi-day-cloudy';
+					            break;
+					        case "partly-cloudy-night": $scope.weatherIcon = 'wi-night-partly-cloudy';
+					            break;
+					        case "cloudy": $scope.weatherIcon = 'wi-cloudy';
+					            break;
+					        case "rain": $scope.weatherIcon = 'wi-rain';
+					            break;
+					        case "sleet": $scope.weatherIcon = 'sleet';
+					            break;
+					        case "snow": $scope.weatherIcon = 'wi-snow';
+					            break;
+					        case "wind": $scope.weatherIcon = 'wi-strong-wind';
+					            break;
+					        case "fog": $scope.weatherIcon = 'wi-fog';
+					            break;
+					        default:
+                        }
+                    })
+                    .catch(function (err) {console.log(err)});
+                }
+            });
+        </script>
+    </body>
+</html>
